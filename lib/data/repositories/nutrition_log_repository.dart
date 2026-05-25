@@ -56,8 +56,7 @@ class NutritionLogRepository {
     try {
       var query = _client
           .from('nutrition_logs')
-          .select()
-          .order('logged_at', ascending: false);
+          .select();
 
       if (startDate != null) {
         query = query.gte(
@@ -73,7 +72,7 @@ class NutritionLogRepository {
         );
       }
 
-      final data = await query;
+      final data = await query.order('logged_at', ascending: false);
 
       final logs = data.map((json) => NutritionLog.fromJson(json)).toList();
 

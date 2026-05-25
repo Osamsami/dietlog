@@ -2,7 +2,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/utils/logger.dart';
 import '../local/hive_boxes.dart';
-import '../local/hive_service.dart';
 import '../models/user_profile.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 

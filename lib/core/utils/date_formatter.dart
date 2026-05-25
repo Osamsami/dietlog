@@ -42,7 +42,7 @@ class DateFormatter {
 
     if (diff == 0) return 'Today';
     if (diff == 1) return 'Yesterday';
-    if (diff < 7) return '${diff} days ago';
+    if (diff < 7) return '$diff days ago';
     return fullDate(dt);
   }
 

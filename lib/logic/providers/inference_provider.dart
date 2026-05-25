@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/network/gemini_service.dart';
-import '../../data/models/inference_result.dart';
 import '../../data/models/nutrition_log.dart';
 import '../../data/repositories/inference_repository.dart';
 import '../../data/repositories/nutrition_log_repository.dart';
