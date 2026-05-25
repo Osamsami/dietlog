@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/constants/supabase_constants.dart';
 import 'core/utils/logger.dart';
+import 'data/local/hive_service.dart';
 
 final _log = AppLogger('Main');
 
@@ -23,8 +23,8 @@ Future<void> main() async {
   );
   _log.info('Supabase client initialized');
 
-  // ── 3. Initialize Hive (local storage) ────────────────────────────────
-  await Hive.initFlutter();
+  // ── 3. Initialize Hive (local storage + adapters + boxes) ─────────────
+  await HiveService.init();
   _log.info('Hive local storage initialized');
 
   // ── 4. Launch App ─────────────────────────────────────────────────────
