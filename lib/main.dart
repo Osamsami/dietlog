@@ -6,6 +6,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/constants/supabase_constants.dart';
 import 'core/utils/logger.dart';
 import 'data/local/hive_service.dart';
+import 'presentation/app_shell.dart';
+import 'presentation/auth/login_screen.dart';
+import 'presentation/auth/signup_screen.dart';
+import 'presentation/dashboard/camera_screen.dart';
+import 'presentation/history/food_detail_screen.dart';
+import 'presentation/splash_screen.dart';
+import 'presentation/theme/app_theme.dart';
 
 final _log = AppLogger('Main');
 
@@ -35,10 +42,7 @@ Future<void> main() async {
   );
 }
 
-/// Root application widget.
-///
-/// ⛔ Presentation layer is blocked — this is a headless shell only.
-/// Screens will be added after the stitch file is provided.
+/// Root application widget with full route table.
 class DietLogApp extends StatelessWidget {
   const DietLogApp({super.key});
 
@@ -47,12 +51,15 @@ class DietLogApp extends StatelessWidget {
     return MaterialApp(
       title: 'DietLog',
       debugShowCheckedModeBanner: false,
-      // Placeholder — no screens until stitch file is provided
-      home: const Scaffold(
-        body: Center(
-          child: Text('DietLog — Headless Shell'),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+      home: const SplashScreen(),
+      routes: {
+        '/login': (_) => const LoginScreen(),
+        '/signup': (_) => const SignupScreen(),
+        '/home': (_) => const AppShell(),
+        '/camera': (_) => const CameraScreen(),
+        '/food-detail': (_) => const FoodDetailScreen(),
+      },
     );
   }
 }
