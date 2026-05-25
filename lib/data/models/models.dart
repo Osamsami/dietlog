@@ -4,7 +4,7 @@
 /// ```dart
 /// import 'package:diet_log/data/models/models.dart';
 /// ```
-library models;
+library;
 export 'inference_result.dart';
 export 'nutrition_log.dart';
 export 'user_profile.dart';
