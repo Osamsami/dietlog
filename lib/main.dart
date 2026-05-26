@@ -18,6 +18,10 @@ import 'presentation/profile/units_screen.dart';
 import 'presentation/splash_screen.dart';
 import 'presentation/theme/app_theme.dart';
 
+// Main entry point of the DietLog application.
+// Initializes environment variables, Supabase services,
+// and launches the app with Riverpod state management.
+
 final _log = AppLogger('Main');
 
 Future<void> main() async {
@@ -39,11 +43,7 @@ Future<void> main() async {
   _log.info('Hive local storage initialized');
 
   // ── 4. Launch App ─────────────────────────────────────────────────────
-  runApp(
-    const ProviderScope(
-      child: DietLogApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: DietLogApp()));
 }
 
 /// Root application widget with full route table.
