@@ -1,20 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:diet_log/logic/providers/nutrition_log_provider.dart';
+import 'package:diet_log/logic/providers/history_filter_provider.dart';
 import 'package:diet_log/presentation/theme/app_theme.dart';
 import 'package:diet_log/presentation/widgets/meal_log_card.dart';
 
-/// Meal history screen showing today's logged meals.
+/// Meal history screen with filter support.
 ///
-/// Consumes [todayLogsProvider] to display a chronological list
-/// of [MealLogCard] entries with an end-of-list indicator.
+/// Consumes [filteredLogsProvider] to display meals based on the
+/// active [HistoryFilter], and [historyFilterProvider] for filter state.
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
 
+  void _showFilterSheet(BuildContext context, WidgetRef ref) {
+    final current = ref.read(historyFilterProvider);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        decoration: const BoxDecoration(
+          color: AppTheme.cardWhite,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Handle bar
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppTheme.divider,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            Row(
+              children: [
+                const Icon(Icons.filter_list, color: AppTheme.primaryDark),
+                const SizedBox(width: 8),
+                const Text('Filter History', style: AppTheme.headingSmall),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Choose a time range or sort order for your meals.',
+              style: AppTheme.bodySmall,
+            ),
+            const SizedBox(height: 20),
+
+            ...HistoryFilter.values.map((filter) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _FilterOption(
+                    filter: filter,
+                    isSelected: filter == current,
+                    onTap: () {
+                      ref.read(historyFilterProvider.notifier).state = filter;
+                      Navigator.pop(context);
+                    },
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logsAsync = ref.watch(todayLogsProvider);
+    final logsAsync = ref.watch(filteredLogsProvider);
+    final activeFilter = ref.watch(historyFilterProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -65,7 +126,7 @@ class HistoryScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'TODAY',
+                    activeFilter.label.toUpperCase(),
                     style: AppTheme.caption.copyWith(
                       color: AppTheme.primaryDark,
                       fontWeight: FontWeight.w600,
@@ -78,19 +139,47 @@ class HistoryScreen extends ConsumerWidget {
                       const Text('Meal History',
                           style: AppTheme.headingLarge),
                       const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppTheme.divider),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'Filter',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.textPrimary,
+                      GestureDetector(
+                        onTap: () => _showFilterSheet(context, ref),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: activeFilter != HistoryFilter.today
+                                ? AppTheme.primary.withValues(alpha: 0.1)
+                                : Colors.transparent,
+                            border: Border.all(
+                              color: activeFilter != HistoryFilter.today
+                                  ? AppTheme.primaryDark
+                                  : AppTheme.divider,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.filter_list,
+                                size: 14,
+                                color: activeFilter != HistoryFilter.today
+                                    ? AppTheme.primaryDark
+                                    : AppTheme.textPrimary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                activeFilter == HistoryFilter.today
+                                    ? 'Filter'
+                                    : activeFilter.label,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: activeFilter != HistoryFilter.today
+                                      ? AppTheme.primaryDark
+                                      : AppTheme.textPrimary,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -120,7 +209,7 @@ class HistoryScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () =>
-                            ref.invalidate(todayLogsProvider),
+                            ref.invalidate(filteredLogsProvider),
                         child: const Text('Retry'),
                       ),
                     ],
@@ -138,14 +227,16 @@ class HistoryScreen extends ConsumerWidget {
                                   .withValues(alpha: 0.3)),
                           const SizedBox(height: 16),
                           Text(
-                            'No meals logged today',
+                            'No meals found',
                             style: AppTheme.bodyMedium.copyWith(
                               color: AppTheme.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Tap the camera button to start tracking',
+                            activeFilter == HistoryFilter.today
+                                ? 'Tap the camera button to start tracking'
+                                : 'No meals logged in this period',
                             style: AppTheme.bodySmall,
                           ),
                         ],
@@ -170,7 +261,7 @@ class HistoryScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                "End of today's log",
+                                'End of ${activeFilter.label.toLowerCase()} log',
                                 style: AppTheme.bodySmall.copyWith(
                                   color: AppTheme.textSecondary
                                       .withValues(alpha: 0.5),
@@ -196,6 +287,74 @@ class HistoryScreen extends ConsumerWidget {
                 },
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterOption extends StatelessWidget {
+  final HistoryFilter filter;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _FilterOption({
+    required this.filter,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  IconData get _icon {
+    switch (filter) {
+      case HistoryFilter.today:
+        return Icons.today;
+      case HistoryFilter.last7Days:
+        return Icons.date_range;
+      case HistoryFilter.last30Days:
+        return Icons.calendar_month;
+      case HistoryFilter.highestCalories:
+        return Icons.local_fire_department;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppTheme.primary.withValues(alpha: 0.08)
+              : AppTheme.cardWhite,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryDark : AppTheme.divider,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              _icon,
+              size: 20,
+              color: isSelected ? AppTheme.primaryDark : AppTheme.textSecondary,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              filter.label,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                color: isSelected ? AppTheme.primaryDark : AppTheme.textPrimary,
+              ),
+            ),
+            const Spacer(),
+            if (isSelected)
+              const Icon(Icons.check_circle,
+                  size: 20, color: AppTheme.primaryDark),
           ],
         ),
       ),

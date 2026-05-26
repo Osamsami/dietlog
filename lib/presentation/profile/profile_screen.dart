@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:diet_log/logic/providers/auth_provider.dart';
+import 'package:diet_log/logic/providers/measurements_provider.dart';
 import 'package:diet_log/presentation/theme/app_theme.dart';
+import 'measurements_updater.dart';
 
 /// User profile screen with daily goals, personal info, and settings.
 ///
@@ -21,6 +23,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(currentUserProfileProvider);
+    final measurements = ref.watch(measurementsProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -151,11 +154,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           child: Row(
                             children: [
-                              _InfoChip(label: 'HEIGHT', value: '182 cm'),
+                              _InfoChip(label: 'HEIGHT', value: '${measurements.heightCm.toStringAsFixed(0)} cm'),
                               const SizedBox(width: 12),
-                              _InfoChip(label: 'WEIGHT', value: '78 kg'),
+                              _InfoChip(label: 'WEIGHT', value: '${measurements.weightKg.toStringAsFixed(0)} kg'),
                               const SizedBox(width: 12),
-                              _InfoChip(label: 'AGE', value: '28 yrs'),
+                              _InfoChip(label: 'AGE', value: '${measurements.age} yrs'),
                             ],
                           ),
                         ),
@@ -163,7 +166,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton(
-                            onPressed: () {},
+                            onPressed: () => MeasurementsUpdater.show(context),
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(
                                   color: AppTheme.divider),
@@ -208,13 +211,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           icon: Icons.straighten,
                           label: 'Units',
                           trailing: 'Metric',
-                          onTap: () {},
+                          onTap: () => Navigator.pushNamed(context, '/units'),
                         ),
                         const Divider(color: AppTheme.divider, height: 1),
                         _SettingsRow(
                           icon: Icons.help_outline,
                           label: 'Support',
-                          onTap: () {},
+                          onTap: () => Navigator.pushNamed(context, '/support'),
                         ),
                       ],
                     ),
