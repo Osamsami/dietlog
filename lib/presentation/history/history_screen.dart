@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:diet_log/logic/providers/auth_provider.dart';
 import 'package:diet_log/logic/providers/history_filter_provider.dart';
 import 'package:diet_log/presentation/theme/app_theme.dart';
 import 'package:diet_log/presentation/widgets/meal_log_card.dart';
@@ -76,6 +77,8 @@ class HistoryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final logsAsync = ref.watch(filteredLogsProvider);
     final activeFilter = ref.watch(historyFilterProvider);
+    final user = ref.watch(currentAuthUserProvider);
+    final avatarUrl = user?.userMetadata?['avatar_url'] as String?;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -89,12 +92,18 @@ class HistoryScreen extends ConsumerWidget {
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 22,
-                    backgroundColor:
-                        AppTheme.primary.withValues(alpha: 0.15),
-                    child: const Icon(Icons.person,
-                        color: AppTheme.primaryDark, size: 22),
+                  GestureDetector(
+                    onTap: () => Navigator.pushNamed(context, '/profile'),
+                    child: CircleAvatar(
+                      radius: 22,
+                      backgroundColor:
+                          AppTheme.primary.withValues(alpha: 0.15),
+                      backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                      child: avatarUrl == null
+                          ? const Icon(Icons.person,
+                              color: AppTheme.primaryDark, size: 22)
+                          : null,
+                    ),
                   ),
                   const Expanded(
                     child: Center(
@@ -109,7 +118,7 @@ class HistoryScreen extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () => Navigator.pushNamed(context, '/notifications'),
                     icon: const Icon(Icons.notifications_none_rounded,
                         color: AppTheme.textSecondary),
                   ),

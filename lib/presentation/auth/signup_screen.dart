@@ -9,6 +9,12 @@ import 'package:diet_log/presentation/theme/app_theme.dart';
 ///
 /// Collects full name, email, password (with confirmation) and calls
 /// [AuthRepository.signUp] via Riverpod on submission.
+///
+/// ## Supabase Email Confirmation Handling:
+/// When email confirmation is enabled in Supabase Dashboard,
+/// `signUp()` returns `AuthResponse.session == null`. This screen
+/// detects that and navigates to [ConfirmationPendingScreen] instead
+/// of `/home`, preventing the "confirmation required" crash.
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
@@ -41,7 +47,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(authRepositoryProvider).signUp(
+      final response = await ref.read(authRepositoryProvider).signUp(
             email: _emailController.text.trim(),
             password: _passwordController.text,
             fullName: _fullNameController.text.trim(),
@@ -49,14 +55,22 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.pushReplacementNamed(context, '/home');
+      // Check if Supabase returned a valid session.
+      // When email confirmation is ENABLED, session will be null
+      // because the user hasn't verified their email yet.
+      if (response.session != null) {
+        // Email confirmation is DISABLED — user is fully authenticated
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        // Email confirmation is ENABLED — redirect to pending screen
+        Navigator.pushReplacementNamed(context, '/confirm-email');
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/utils/logger.dart';
@@ -146,6 +148,53 @@ class AuthRepository {
     await _cacheCurrentProfile();
 
     _log.info('Profile updated successfully');
+  }
+
+  /// Upload a profile picture to Supabase Storage and update user metadata.
+  Future<String> uploadAvatar(String localPath) async {
+    final user = currentUser;
+    if (user == null) {
+      throw AuthException('Cannot upload avatar — not authenticated');
+    }
+
+    _log.info('Uploading avatar for user: ${user.id}');
+
+    final file = File(localPath);
+    final fileExt = localPath.split('.').last;
+    final fileName = '${user.id}.${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+
+    // Upload to 'profile-pictures' bucket
+    await _client.storage
+        .from('profile-pictures')
+        .upload(fileName, file);
+
+    // Get public URL
+    final publicUrl = _client.storage
+        .from('profile-pictures')
+        .getPublicUrl(fileName);
+
+    // Update Supabase Auth metadata
+    await _client.auth.updateUser(
+      UserAttributes(
+        data: {'avatar_url': publicUrl},
+      ),
+    );
+
+    // Also update profiles table if supported
+    try {
+      await _client
+          .from('profiles')
+          .update({'avatar_url': publicUrl})
+          .eq('id', user.id);
+    } catch (_) {
+      // Non-fatal if schema differs
+    }
+
+    // Refresh local cache
+    await _cacheCurrentProfile();
+
+    _log.info('Avatar uploaded successfully: $publicUrl');
+    return publicUrl;
   }
 
   // ── Private Helpers ─────────────────────────────────────────────────────

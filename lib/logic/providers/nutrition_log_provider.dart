@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/constants/app_constants.dart';
 import '../../data/models/nutrition_log.dart';
 import '../../data/repositories/nutrition_log_repository.dart';
+import 'user_preferences_provider.dart';
 
 /// Provides the [NutritionLogRepository] singleton instance.
+/// Encapsulates all Supabase + Hive CRUD operations for nutrition logs.
 final nutritionLogRepositoryProvider =
     Provider<NutritionLogRepository>((ref) {
   return NutritionLogRepository();
@@ -13,6 +14,7 @@ final nutritionLogRepositoryProvider =
 /// FutureProvider for today's nutrition logs.
 ///
 /// Auto-disposes when no longer listened to, ensuring fresh data on re-read.
+/// Consumed by the History screen (via filteredLogsProvider) and Dashboard.
 final todayLogsProvider =
     AutoDisposeFutureProvider<List<NutritionLog>>((ref) async {
   final repo = ref.watch(nutritionLogRepositoryProvider);
@@ -35,11 +37,15 @@ final monthlyLogsProvider =
 
 /// Computed provider for today's daily nutrition summary.
 ///
-/// Returns a [DailySummary] containing total calories and macros
-/// for the current day, computed from [todayLogsProvider].
+/// DYNAMIC GOALS: Reads calorie/macro targets from [userPreferencesProvider]
+/// instead of hardcoded AppConstants. This means when the user updates
+/// their goals in the Profile screen, the Dashboard progress ring
+/// updates reactively via Riverpod's dependency graph.
 final dailySummaryProvider =
     AutoDisposeFutureProvider<DailySummary>((ref) async {
   final logsAsync = await ref.watch(todayLogsProvider.future);
+  // Read dynamic user goals — reactively rebuilds when goals change
+  final prefs = ref.watch(userPreferencesProvider);
 
   final totalCalories =
       logsAsync.fold<int>(0, (sum, log) => sum + log.calories);
@@ -56,14 +62,17 @@ final dailySummaryProvider =
     totalCarbs: totalCarbs,
     totalFats: totalFats,
     logCount: logsAsync.length,
-    calorieTarget: AppConstants.defaultCalorieTarget,
-    proteinTarget: AppConstants.defaultProteinTarget,
-    carbsTarget: AppConstants.defaultCarbsTarget,
-    fatsTarget: AppConstants.defaultFatsTarget,
+    calorieTarget: prefs.calorieGoal,
+    proteinTarget: (prefs.calorieGoal * 0.25) / 4.0,
+    carbsTarget: (prefs.calorieGoal * 0.50) / 4.0,
+    fatsTarget: (prefs.calorieGoal * 0.25) / 9.0,
   );
 });
 
 /// Immutable data class representing a daily nutrition summary.
+///
+/// Contains aggregated totals and targets used by the Dashboard's
+/// ProgressRing and MacroCard widgets.
 class DailySummary {
   final int totalCalories;
   final double totalProtein;

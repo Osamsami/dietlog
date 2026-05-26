@@ -11,6 +11,8 @@ import 'presentation/auth/login_screen.dart';
 import 'presentation/auth/signup_screen.dart';
 import 'presentation/dashboard/camera_screen.dart';
 import 'presentation/history/food_detail_screen.dart';
+import 'presentation/profile/notification_screen.dart';
+import 'presentation/profile/profile_screen.dart';
 import 'presentation/profile/support_screen.dart';
 import 'presentation/profile/units_screen.dart';
 import 'presentation/splash_screen.dart';
@@ -61,6 +63,8 @@ class DietLogApp extends StatelessWidget {
         '/home': (_) => const AppShell(),
         '/camera': (_) => const CameraScreen(),
         '/food-detail': (_) => const FoodDetailScreen(),
+        '/profile': (_) => const ProfileScreen(),
+        '/notifications': (_) => const NotificationScreen(),
         '/units': (_) => const UnitsScreen(),
         '/support': (_) => const SupportScreen(),
       },
