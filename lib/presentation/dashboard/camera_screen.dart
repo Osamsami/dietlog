@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // INJECTED: Supabase import for sync bypass
 
 import 'package:diet_log/logic/providers/auth_provider.dart';
 import 'package:diet_log/logic/providers/inference_provider.dart';
@@ -116,20 +117,23 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
   /// Pipeline: CameraController.takePicture() → XFile → File →
   /// InferenceNotifier.analyzeAndLog() (Gemini Vision API)
   Future<void> _captureAndAnalyze() async {
-    // Verify user is authenticated before calling the AI pipeline
-    final userId = ref.read(currentAuthUserIdProvider);
-    if (userId == null) {
-      _showSnack('Please sign in first', isError: true);
+    // INJECTED: Industrial Fix: Synchronous read from Supabase cache bypassing Riverpod stream latency
+    final sessionUser = Supabase.instance.client.auth.currentUser;
+    if (sessionUser == null) {
+      _showSnack(
+        'Authentication out of sync. Please restart app.',
+        isError: true,
+      );
       return;
     }
+    final String userId = sessionUser.id;
 
     if (_cameraController != null && _cameraController!.value.isInitialized) {
       try {
         final XFile photo = await _cameraController!.takePicture();
-        ref.read(inferenceNotifierProvider.notifier).analyzeAndLog(
-              imageFile: File(photo.path),
-              userId: userId,
-            );
+        ref
+            .read(inferenceNotifierProvider.notifier)
+            .analyzeAndLog(imageFile: File(photo.path), userId: userId);
       } catch (e) {
         _showSnack('Failed to capture photo: $e', isError: true);
       }
@@ -141,11 +145,16 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
 
   /// Fallback: pick image from device gallery for analysis.
   Future<void> _pickFromGallery() async {
-    final userId = ref.read(currentAuthUserIdProvider);
-    if (userId == null) {
-      _showSnack('Please sign in first', isError: true);
+    // INJECTED: Industrial Fix: Synchronous read from Supabase cache bypassing Riverpod stream latency
+    final sessionUser = Supabase.instance.client.auth.currentUser;
+    if (sessionUser == null) {
+      _showSnack(
+        'Authentication out of sync. Please restart app.',
+        isError: true,
+      );
       return;
     }
+    final String userId = sessionUser.id;
 
     final XFile? image = await _picker.pickImage(
       source: ImageSource.gallery,
@@ -155,10 +164,9 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
 
     if (image == null) return;
 
-    ref.read(inferenceNotifierProvider.notifier).analyzeAndLog(
-          imageFile: File(image.path),
-          userId: userId,
-        );
+    ref
+        .read(inferenceNotifierProvider.notifier)
+        .analyzeAndLog(imageFile: File(image.path), userId: userId);
   }
 
   void _showSnack(String message, {bool isError = false}) {
@@ -204,8 +212,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
             right: 0,
             child: SafeArea(
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: Row(
                   children: [
                     IconButton(
@@ -229,8 +236,10 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
                       onPressed: inferenceState is InferenceLoading
                           ? null
                           : _pickFromGallery,
-                      icon: const Icon(Icons.photo_library_outlined,
-                          color: Colors.white),
+                      icon: const Icon(
+                        Icons.photo_library_outlined,
+                        color: Colors.white,
+                      ),
                       tooltip: 'Pick from gallery',
                     ),
                   ],
@@ -251,7 +260,9 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
               child: Center(
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 8),
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(20),
@@ -259,8 +270,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.restaurant,
-                          color: AppTheme.primary, size: 16),
+                      Icon(Icons.restaurant, color: AppTheme.primary, size: 16),
                       SizedBox(width: 6),
                       Text(
                         'Analyzing with Gemini AI...',
@@ -281,8 +291,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
               padding: const EdgeInsets.fromLTRB(24, 28, 24, 36),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -309,12 +318,13 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
                       value: inferenceState is InferenceLoading
                           ? null
                           : inferenceState is InferenceSuccess
-                              ? 1.0
-                              : 0.0,
+                          ? 1.0
+                          : 0.0,
                       minHeight: 6,
                       backgroundColor: AppTheme.divider,
                       valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppTheme.primary),
+                        AppTheme.primary,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -326,17 +336,16 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
                         child: OutlinedButton(
                           onPressed: () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 14),
-                            side:
-                                const BorderSide(color: AppTheme.divider),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            side: const BorderSide(color: AppTheme.divider),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text('Cancel',
-                              style:
-                                  TextStyle(color: AppTheme.textPrimary)),
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(color: AppTheme.textPrimary),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -346,8 +355,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
                           onPressed: inferenceState is InferenceLoading
                               ? null
                               : _captureAndAnalyze,
-                          icon:
-                              const Icon(Icons.camera_alt_rounded, size: 18),
+                          icon: const Icon(Icons.camera_alt_rounded, size: 18),
                           label: Text(
                             inferenceState is InferenceLoading
                                 ? 'Analyzing...'
@@ -356,8 +364,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primary,
                             foregroundColor: Colors.white,
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -389,8 +396,11 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.camera_alt, size: 64,
-                  color: Colors.white.withValues(alpha: 0.15)),
+              Icon(
+                Icons.camera_alt,
+                size: 64,
+                color: Colors.white.withValues(alpha: 0.15),
+              ),
               const SizedBox(height: 12),
               Text(
                 _cameraErrorMsg,
@@ -454,17 +464,25 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
       child: Stack(
         children: [
           Positioned(
-              top: 0, left: 0,
-              child: _CornerBracket(corner: _Corner.topLeft)),
+            top: 0,
+            left: 0,
+            child: _CornerBracket(corner: _Corner.topLeft),
+          ),
           Positioned(
-              top: 0, right: 0,
-              child: _CornerBracket(corner: _Corner.topRight)),
+            top: 0,
+            right: 0,
+            child: _CornerBracket(corner: _Corner.topRight),
+          ),
           Positioned(
-              bottom: 0, left: 0,
-              child: _CornerBracket(corner: _Corner.bottomLeft)),
+            bottom: 0,
+            left: 0,
+            child: _CornerBracket(corner: _Corner.bottomLeft),
+          ),
           Positioned(
-              bottom: 0, right: 0,
-              child: _CornerBracket(corner: _Corner.bottomRight)),
+            bottom: 0,
+            right: 0,
+            child: _CornerBracket(corner: _Corner.bottomRight),
+          ),
         ],
       ),
     );
@@ -487,17 +505,15 @@ class _CornerBracket extends StatelessWidget {
           top: corner == _Corner.topLeft || corner == _Corner.topRight
               ? const BorderSide(color: Colors.white, width: 3)
               : BorderSide.none,
-          bottom:
-              corner == _Corner.bottomLeft || corner == _Corner.bottomRight
-                  ? const BorderSide(color: Colors.white, width: 3)
-                  : BorderSide.none,
+          bottom: corner == _Corner.bottomLeft || corner == _Corner.bottomRight
+              ? const BorderSide(color: Colors.white, width: 3)
+              : BorderSide.none,
           left: corner == _Corner.topLeft || corner == _Corner.bottomLeft
               ? const BorderSide(color: Colors.white, width: 3)
               : BorderSide.none,
-          right:
-              corner == _Corner.topRight || corner == _Corner.bottomRight
-                  ? const BorderSide(color: Colors.white, width: 3)
-                  : BorderSide.none,
+          right: corner == _Corner.topRight || corner == _Corner.bottomRight
+              ? const BorderSide(color: Colors.white, width: 3)
+              : BorderSide.none,
         ),
       ),
     );
