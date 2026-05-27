@@ -1,8 +1,16 @@
 <div align="center">
-  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" />
-  <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" />
-  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
-  <img src="https://img.shields.io/badge/Google%20Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white" />
+  <a href="https://flutter.dev">
+    <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" style="display: inline-block; margin: 2px;" />
+  </a>
+  <a href="https://dart.dev">
+    <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" style="display: inline-block; margin: 2px;" />
+  </a>
+  <a href="https://supabase.com">
+    <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" style="display: inline-block; margin: 2px;" />
+  </a>
+  <a href="https://deepmind.google/technologies/gemini/">
+    <img src="https://img.shields.io/badge/Google%20Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white" style="display: inline-block; margin: 2px;" />
+  </a>
 </div>
 <br/>
 
