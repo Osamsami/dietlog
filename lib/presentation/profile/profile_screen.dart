@@ -307,9 +307,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     // Bind Name and Email to metadata with database profile fallback
     final String displayName =
-        user?.userMetadata?['full_name'] as String? ??
-        profileAsync.value?.fullName ??
-        user?.email?.split('@').first ??
+        profileAsync.value?.fullName ?? // Database result first
+        user?.userMetadata?['full_name'] as String? ?? // Auth metadata fallback
+        user?.email?.split('@').first ?? // Email handle fallback
         'User';
 
     final String userEmail =
