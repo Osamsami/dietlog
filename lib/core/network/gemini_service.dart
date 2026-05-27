@@ -73,10 +73,8 @@ Rules:
           'parts': [
             {'text': _systemPrompt},
             {
-              'inline_data': {
-                'mime_type': mimeType,
-                'data': base64Image,
-              },
+              // INDUSTRIAL FIX: Changed from inline_data to inlineData and mime_type to mimeType
+              'inlineData': {'mimeType': mimeType, 'data': base64Image},
             },
           ],
         },
@@ -110,8 +108,10 @@ Rules:
         );
       }
 
-      _log.info('Inference success: ${result.foodItemIdentified} '
-          '(${result.confidenceScore} confidence)');
+      _log.info(
+        'Inference success: ${result.foodItemIdentified} '
+        '(${result.confidenceScore} confidence)',
+      );
       return result;
     } on DioException catch (e) {
       _log.error('Gemini API request failed', e, e.stackTrace);
@@ -155,8 +155,9 @@ Rules:
     if (text.startsWith('```')) {
       final lines = text.split('\n');
       // Remove first line (```json) and last line (```)
-      final filtered =
-          lines.where((line) => !line.trim().startsWith('```')).toList();
+      final filtered = lines
+          .where((line) => !line.trim().startsWith('```'))
+          .toList();
       return filtered.join('\n').trim();
     }
     return text;
