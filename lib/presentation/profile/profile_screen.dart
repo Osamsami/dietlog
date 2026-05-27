@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // INJECTED: Supabase import for session refresh
 
 import 'package:diet_log/logic/providers/auth_provider.dart';
 import 'package:diet_log/logic/providers/measurements_provider.dart';
@@ -50,7 +51,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       // Upload picture to 'profile-pictures' storage bucket via Repository
       await ref.read(authRepositoryProvider).uploadAvatar(image.path);
 
-      // Invalidate provider so UI gets refreshed with the new avatarURL
+      // INDUSTRIAL FIX: Force refresh Supabase session metadata AND Riverpod states
+      await Supabase.instance.client.auth.refreshSession();
+      ref.invalidate(currentAuthUserProvider);
       ref.invalidate(currentUserProfileProvider);
 
       messenger.showSnackBar(
@@ -94,7 +97,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -103,8 +109,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 final messenger = ScaffoldMessenger.of(context);
                 Navigator.pop(context);
                 try {
-                  await ref.read(authRepositoryProvider).updateProfile(fullName: newName);
+                  await ref
+                      .read(authRepositoryProvider)
+                      .updateProfile(fullName: newName);
+
+                  // INDUSTRIAL FIX: Force refresh Supabase session metadata AND Riverpod states
+                  await Supabase.instance.client.auth.refreshSession();
+                  ref.invalidate(currentAuthUserProvider);
                   ref.invalidate(currentUserProfileProvider);
+
                   messenger.showSnackBar(
                     const SnackBar(
                       content: Text('Display name updated successfully!'),
@@ -126,7 +139,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: const Text('Save'),
           ),
@@ -147,7 +162,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_camera, color: AppTheme.primaryDark),
+              leading: const Icon(
+                Icons.photo_camera,
+                color: AppTheme.primaryDark,
+              ),
               title: const Text('Change Profile Picture'),
               onTap: () {
                 Navigator.pop(context);
@@ -187,13 +205,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               final newGoal = int.tryParse(controller.text);
               if (newGoal != null && newGoal > 0) {
-                ref.read(userPreferencesProvider.notifier).updateCalorieGoal(newGoal);
+                ref
+                    .read(userPreferencesProvider.notifier)
+                    .updateCalorieGoal(newGoal);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -207,7 +230,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: const Text('Save'),
           ),
@@ -218,7 +243,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   /// Dialog to update the daily water goal.
   void _editWaterGoal(BuildContext context, double currentGoal) {
-    final controller = TextEditingController(text: currentGoal.toStringAsFixed(1));
+    final controller = TextEditingController(
+      text: currentGoal.toStringAsFixed(1),
+    );
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -235,13 +262,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               final newGoal = double.tryParse(controller.text);
               if (newGoal != null && newGoal > 0) {
-                ref.read(userPreferencesProvider.notifier).updateWaterGoal(newGoal);
+                ref
+                    .read(userPreferencesProvider.notifier)
+                    .updateWaterGoal(newGoal);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -255,7 +287,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: const Text('Save'),
           ),
@@ -272,17 +306,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final userPrefs = ref.watch(userPreferencesProvider);
 
     // Bind Name and Email to metadata with database profile fallback
-    final String displayName = user?.userMetadata?['full_name'] as String? ?? 
-        profileAsync.value?.fullName ?? 
-        user?.email?.split('@').first ?? 
+    final String displayName =
+        user?.userMetadata?['full_name'] as String? ??
+        profileAsync.value?.fullName ??
+        user?.email?.split('@').first ??
         'User';
-    
-    final String userEmail = user?.email ?? profileAsync.value?.email ?? 'No email';
-    final String? avatarUrl = user?.userMetadata?['avatar_url'] as String? ?? 
-        user?.userMetadata?['picture'] as String?; // Support google signin if present
 
-    final String signupYear = profileAsync.value?.createdAt != null 
-        ? profileAsync.value!.createdAt!.year.toString() 
+    final String userEmail =
+        user?.email ?? profileAsync.value?.email ?? 'No email';
+    final String? avatarUrl =
+        user?.userMetadata?['avatar_url'] as String? ??
+        user?.userMetadata?['picture']
+            as String?; // Support google signin if present
+
+    final String signupYear = profileAsync.value?.createdAt != null
+        ? profileAsync.value!.createdAt!.year.toString()
         : DateTime.now().year.toString();
 
     // Check if navigated as standalone screen or embedded tab
@@ -300,7 +338,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 children: [
                   if (canPop) ...[
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: AppTheme.textPrimary),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        size: 20,
+                        color: AppTheme.textPrimary,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                     const SizedBox(width: 8),
@@ -315,8 +357,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   const Spacer(),
                   IconButton(
-                    onPressed: () => Navigator.pushNamed(context, '/notifications'),
-                    icon: const Icon(Icons.notifications_none_rounded, color: AppTheme.textSecondary),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/notifications'),
+                    icon: const Icon(
+                      Icons.notifications_none_rounded,
+                      color: AppTheme.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -342,10 +388,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 onTap: () => _showEditProfileMenu(displayName),
                                 child: CircleAvatar(
                                   radius: 54,
-                                  backgroundColor: AppTheme.primary.withValues(alpha: 0.15),
-                                  backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                                  backgroundColor: AppTheme.primary.withValues(
+                                    alpha: 0.15,
+                                  ),
+                                  backgroundImage: avatarUrl != null
+                                      ? NetworkImage(avatarUrl)
+                                      : null,
                                   child: avatarUrl == null
-                                      ? const Icon(Icons.person, size: 54, color: AppTheme.primaryDark)
+                                      ? const Icon(
+                                          Icons.person,
+                                          size: 54,
+                                          color: AppTheme.primaryDark,
+                                        )
                                       : null,
                                 ),
                               ),
@@ -358,7 +412,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     ),
                                     child: const Center(
                                       child: CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              AppTheme.primary,
+                                            ),
                                       ),
                                     ),
                                   ),
@@ -367,16 +424,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 bottom: 0,
                                 right: 4,
                                 child: GestureDetector(
-                                  onTap: () => _showEditProfileMenu(displayName),
+                                  onTap: () =>
+                                      _showEditProfileMenu(displayName),
                                   child: Container(
                                     width: 32,
                                     height: 32,
                                     decoration: BoxDecoration(
                                       color: AppTheme.primaryDark,
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: AppTheme.background, width: 2),
+                                      border: Border.all(
+                                        color: AppTheme.background,
+                                        width: 2,
+                                      ),
                                     ),
-                                    child: const Icon(Icons.edit, size: 14, color: Colors.white),
+                                    child: const Icon(
+                                      Icons.edit,
+                                      size: 14,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -391,7 +456,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               IconButton(
                                 constraints: const BoxConstraints(),
                                 padding: EdgeInsets.zero,
-                                icon: const Icon(Icons.edit, size: 16, color: AppTheme.textSecondary),
+                                icon: const Icon(
+                                  Icons.edit,
+                                  size: 16,
+                                  color: AppTheme.textSecondary,
+                                ),
                                 onPressed: () => _editDisplayName(displayName),
                               ),
                             ],
@@ -418,16 +487,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           icon: Icons.local_fire_department,
                           iconColor: AppTheme.primaryDark,
                           label: 'CALORIE GOAL',
-                          value: '${userPrefs.calorieGoal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} kcal',
-                          onTap: () => _editCalorieGoal(context, userPrefs.calorieGoal),
+                          value:
+                              '${userPrefs.calorieGoal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} kcal',
+                          onTap: () =>
+                              _editCalorieGoal(context, userPrefs.calorieGoal),
                         ),
                         const Divider(color: AppTheme.divider, height: 1),
                         _GoalRow(
                           icon: Icons.water_drop,
                           iconColor: Colors.blue,
                           label: 'WATER GOAL',
-                          value: '${userPrefs.waterGoalLiters.toStringAsFixed(1)} Liters',
-                          onTap: () => _editWaterGoal(context, userPrefs.waterGoalLiters),
+                          value:
+                              '${userPrefs.waterGoalLiters.toStringAsFixed(1)} Liters',
+                          onTap: () => _editWaterGoal(
+                            context,
+                            userPrefs.waterGoalLiters,
+                          ),
                         ),
                       ],
                     ),
@@ -443,11 +518,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           child: Row(
                             children: [
-                              _InfoChip(label: 'HEIGHT', value: '${measurements.heightCm.toStringAsFixed(0)} cm'),
+                              _InfoChip(
+                                label: 'HEIGHT',
+                                value:
+                                    '${measurements.heightCm.toStringAsFixed(0)} cm',
+                              ),
                               const SizedBox(width: 12),
-                              _InfoChip(label: 'WEIGHT', value: '${measurements.weightKg.toStringAsFixed(0)} kg'),
+                              _InfoChip(
+                                label: 'WEIGHT',
+                                value:
+                                    '${measurements.weightKg.toStringAsFixed(0)} kg',
+                              ),
                               const SizedBox(width: 12),
-                              _InfoChip(label: 'AGE', value: '${measurements.age} yrs'),
+                              _InfoChip(
+                                label: 'AGE',
+                                value: '${measurements.age} yrs',
+                              ),
                             ],
                           ),
                         ),
@@ -460,12 +546,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               side: const BorderSide(color: AppTheme.divider),
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusMd,
+                                ),
                               ),
                             ),
                             child: const Text(
                               'Update Measurements',
-                              style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                color: AppTheme.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
@@ -481,16 +572,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.notifications_active_outlined, size: 20, color: AppTheme.textSecondary),
+                            const Icon(
+                              Icons.notifications_active_outlined,
+                              size: 20,
+                              color: AppTheme.textSecondary,
+                            ),
                             const SizedBox(width: 12),
-                            const Text('Notifications', style: AppTheme.bodyMedium),
+                            const Text(
+                              'Notifications',
+                              style: AppTheme.bodyMedium,
+                            ),
                             const Spacer(),
                             Switch.adaptive(
                               value: _notificationsEnabled,
                               onChanged: (v) {
                                 setState(() => _notificationsEnabled = v);
                                 if (v) {
-                                  Navigator.pushNamed(context, '/notifications');
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/notifications',
+                                  );
                                 }
                               },
                               activeTrackColor: AppTheme.primaryDark,
@@ -520,7 +621,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       onPressed: () async {
                         await ref.read(authRepositoryProvider).signOut();
                         if (!context.mounted) return;
-                        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/login',
+                          (route) => false,
+                        );
                       },
                       icon: const Icon(Icons.logout, color: AppTheme.error),
                       label: const Text(
@@ -698,7 +803,11 @@ class _SettingsRow extends StatelessWidget {
               Text(trailing!, style: AppTheme.bodySmall),
               const SizedBox(width: 4),
             ],
-            const Icon(Icons.chevron_right, color: AppTheme.textSecondary, size: 20),
+            const Icon(
+              Icons.chevron_right,
+              color: AppTheme.textSecondary,
+              size: 20,
+            ),
           ],
         ),
       ),
