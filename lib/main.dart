@@ -7,6 +7,7 @@ import 'core/constants/supabase_constants.dart';
 import 'core/utils/logger.dart';
 import 'data/local/hive_service.dart';
 import 'presentation/app_shell.dart';
+import 'presentation/auth/confirmation_pending_screen.dart';
 import 'presentation/auth/login_screen.dart';
 import 'presentation/auth/signup_screen.dart';
 import 'presentation/dashboard/camera_screen.dart';
@@ -60,6 +61,7 @@ class DietLogApp extends StatelessWidget {
       routes: {
         '/login': (_) => const LoginScreen(),
         '/signup': (_) => const SignupScreen(),
+        '/confirm-email': (_) => const ConfirmationPendingScreen(),
         '/home': (_) => const AppShell(),
         '/camera': (_) => const CameraScreen(),
         '/food-detail': (_) => const FoodDetailScreen(),

@@ -9,26 +9,18 @@ import '../utils/logger.dart';
 
 final _log = AppLogger('GeminiService');
 
-/// Service for communicating with the Google Gemini Vision API.
-///
-/// Implements the inference pipeline from the project specification
-/// (Section 3) — sends food images to the Gemini multimodal model
-/// and forces a strict JSON schema response containing nutritional data.
 class GeminiService {
   static const String _baseUrl =
       'https://generativelanguage.googleapis.com/v1beta';
 
-  static const String _model = 'gemini-2.0-flash';
+  static const String _model = 'gemini-1.5-flash';
 
   final Dio _dio;
 
   GeminiService({Dio? dio}) : _dio = dio ?? Dio();
 
-  /// API key loaded from environment.
   String get _apiKey => dotenv.env['GEMINI_API_KEY'] ?? '';
 
-  /// The structured prompt that forces the LLM to emit a strict JSON schema
-  /// with zero conversational text (spec Section 3 guardrail).
   static const String _systemPrompt = '''
 You are a food nutrition analysis engine. You receive a photo of a food item.
 You MUST respond with ONLY a valid JSON object — no markdown, no explanation,
@@ -44,21 +36,8 @@ The JSON MUST match this exact schema:
   "fats_grams": <float: estimated fats in grams>,
   "serving_size_estimate": "<string: estimated serving size>"
 }
-
-Rules:
-- All numeric values MUST be non-negative.
-- confidence_score MUST be between 0.0 and 1.0.
-- Do NOT wrap the JSON in markdown code fences.
-- Do NOT include any text outside the JSON object.
 ''';
 
-  /// Analyze a food image and return structured nutritional data.
-  ///
-  /// Sends [imageBytes] to Gemini Vision with a JSON schema constraint.
-  /// Returns an [InferenceResult] if the response is valid, or throws
-  /// an exception if the guardrail validation fails.
-  ///
-  /// The [mimeType] should match the image format (default: `image/jpeg`).
   Future<InferenceResult> analyzeFood(
     Uint8List imageBytes, {
     String mimeType = 'image/jpeg',
@@ -73,7 +52,6 @@ Rules:
           'parts': [
             {'text': _systemPrompt},
             {
-              // INDUSTRIAL FIX: Changed from inline_data to inlineData and mime_type to mimeType
               'inlineData': {'mimeType': mimeType, 'data': base64Image},
             },
           ],
@@ -100,7 +78,6 @@ Rules:
 
       final result = _parseResponse(response.data);
 
-      // ── Guardrail Validation (Spec Section 3) ─────────────────────────
       if (!result.isValid) {
         _log.error('Inference result failed guardrail validation: $result');
         throw InferenceGuardrailException(
@@ -109,19 +86,21 @@ Rules:
       }
 
       _log.info(
-        'Inference success: ${result.foodItemIdentified} '
-        '(${result.confidenceScore} confidence)',
+        'Inference success: ${result.foodItemIdentified} (${result.confidenceScore} confidence)',
       );
       return result;
     } on DioException catch (e) {
-      _log.error('Gemini API request failed', e, e.stackTrace);
-      throw InferenceNetworkException(
-        'Failed to reach Gemini API: ${e.message}',
-      );
+      final dynamic responseData = e.response?.data;
+      final String googleError = responseData != null
+          ? responseData.toString()
+          : (e.message ?? 'Unknown Network Error');
+
+      _log.error('Gemini API request failed. Server response: $googleError');
+
+      throw InferenceNetworkException('Google API Error: $googleError');
     }
   }
 
-  /// Parse the Gemini API response and extract the [InferenceResult].
   InferenceResult _parseResponse(dynamic responseData) {
     try {
       final candidates = responseData['candidates'] as List<dynamic>;
@@ -136,9 +115,6 @@ Rules:
       }
 
       final rawText = parts[0]['text'] as String;
-      _log.debug('Raw Gemini response text: $rawText');
-
-      // Parse JSON — handle potential markdown fences despite prompt
       final cleanedJson = _stripMarkdownFences(rawText.trim());
       final jsonMap = jsonDecode(cleanedJson) as Map<String, dynamic>;
 
@@ -150,11 +126,9 @@ Rules:
     }
   }
 
-  /// Strip markdown code fences if the model wraps JSON despite instructions.
   String _stripMarkdownFences(String text) {
     if (text.startsWith('```')) {
       final lines = text.split('\n');
-      // Remove first line (```json) and last line (```)
       final filtered = lines
           .where((line) => !line.trim().startsWith('```'))
           .toList();
@@ -164,28 +138,21 @@ Rules:
   }
 }
 
-// ── Inference Exceptions ──────────────────────────────────────────────────────
-
-/// Base class for inference pipeline exceptions.
 sealed class InferenceException implements Exception {
   final String message;
   const InferenceException(this.message);
-
   @override
   String toString() => '$runtimeType: $message';
 }
 
-/// Thrown when the Gemini API response fails guardrail validation.
 class InferenceGuardrailException extends InferenceException {
   const InferenceGuardrailException(super.message);
 }
 
-/// Thrown when the Gemini API response cannot be parsed.
 class InferenceParseException extends InferenceException {
   const InferenceParseException(super.message);
 }
 
-/// Thrown when the network request to Gemini API fails.
 class InferenceNetworkException extends InferenceException {
   const InferenceNetworkException(super.message);
 }
