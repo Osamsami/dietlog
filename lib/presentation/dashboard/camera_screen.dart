@@ -158,8 +158,9 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
 
     final XFile? image = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 85,
       maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 70,
     );
 
     if (image == null) return;
