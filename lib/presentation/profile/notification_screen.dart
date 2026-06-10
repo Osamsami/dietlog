@@ -182,10 +182,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildSectionHeading(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: AppTheme.spacingXs),
-      child: Text(
-        title,
-        style: AppTheme.headingSmall,
-      ),
+      child: Text(title, style: AppTheme.headingSmall),
     );
   }
 
@@ -267,9 +264,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               const SizedBox(width: AppTheme.spacingSm + 4),
 
               // ── Meal Label ──────────────────────────────────────────
-              Expanded(
-                child: Text(label, style: AppTheme.bodyLarge),
-              ),
+              Expanded(child: Text(label, style: AppTheme.bodyLarge)),
 
               // ── Time Trailing Text ──────────────────────────────────
               Text(

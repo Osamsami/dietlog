@@ -48,8 +48,11 @@ class SupportScreen extends StatelessWidget {
                       color: AppTheme.primary.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.support_agent,
-                        color: AppTheme.primaryDark, size: 28),
+                    child: const Icon(
+                      Icons.support_agent,
+                      color: AppTheme.primaryDark,
+                      size: 28,
+                    ),
                   ),
                   const SizedBox(height: 14),
                   const Text('How can we help?', style: AppTheme.headingMedium),
@@ -65,8 +68,10 @@ class SupportScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // ── FAQ Section ────────────────────────────────────────────────
-            const Text('Frequently Asked Questions',
-                style: AppTheme.headingSmall),
+            const Text(
+              'Frequently Asked Questions',
+              style: AppTheme.headingSmall,
+            ),
             const SizedBox(height: 14),
 
             _FaqItem(
@@ -139,12 +144,7 @@ class SupportScreen extends StatelessWidget {
             const SizedBox(height: 32),
 
             // ── Version ────────────────────────────────────────────────────
-            Center(
-              child: Text(
-                'DietLog v1.0.0',
-                style: AppTheme.caption,
-              ),
-            ),
+            Center(child: Text('DietLog v1.0.0', style: AppTheme.caption)),
             const SizedBox(height: 16),
           ],
         ),
@@ -191,8 +191,10 @@ class _FaqItemState extends State<_FaqItem> {
                   AnimatedRotation(
                     turns: _expanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 200),
-                    child: const Icon(Icons.keyboard_arrow_down,
-                        color: AppTheme.textSecondary),
+                    child: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppTheme.textSecondary,
+                    ),
                   ),
                 ],
               ),

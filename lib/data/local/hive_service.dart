@@ -40,12 +40,16 @@ class HiveService {
   static void _registerAdapters() {
     if (!Hive.isAdapterRegistered(HiveTypeIds.userProfile)) {
       Hive.registerAdapter(UserProfileAdapter());
-      _log.debug('Registered UserProfileAdapter (typeId: ${HiveTypeIds.userProfile})');
+      _log.debug(
+        'Registered UserProfileAdapter (typeId: ${HiveTypeIds.userProfile})',
+      );
     }
 
     if (!Hive.isAdapterRegistered(HiveTypeIds.nutritionLog)) {
       Hive.registerAdapter(NutritionLogAdapter());
-      _log.debug('Registered NutritionLogAdapter (typeId: ${HiveTypeIds.nutritionLog})');
+      _log.debug(
+        'Registered NutritionLogAdapter (typeId: ${HiveTypeIds.nutritionLog})',
+      );
     }
   }
 

@@ -35,7 +35,9 @@ class DashboardScreen extends ConsumerWidget {
                     child: CircleAvatar(
                       radius: 22,
                       backgroundColor: AppTheme.primary.withValues(alpha: 0.15),
-                      backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                      backgroundImage: avatarUrl != null
+                          ? NetworkImage(avatarUrl)
+                          : null,
                       child: avatarUrl == null
                           ? const Icon(
                               Icons.person,
@@ -58,7 +60,8 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.pushNamed(context, '/notifications'),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/notifications'),
                     icon: const Icon(
                       Icons.notifications_none_rounded,
                       color: AppTheme.textSecondary,
@@ -75,8 +78,7 @@ class DashboardScreen extends ConsumerWidget {
               child: summaryAsync.when(
                 loading: () => const Center(
                   child: CircularProgressIndicator(
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                    valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
                   ),
                 ),
                 error: (error, _) => Center(
@@ -85,17 +87,21 @@ class DashboardScreen extends ConsumerWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.error_outline,
-                            size: 48, color: AppTheme.error),
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: AppTheme.error,
+                        ),
                         const SizedBox(height: 16),
-                        Text('Failed to load dashboard',
-                            style: AppTheme.headingSmall),
+                        Text(
+                          'Failed to load dashboard',
+                          style: AppTheme.headingSmall,
+                        ),
                         const SizedBox(height: 8),
                         Text(error.toString(), style: AppTheme.bodySmall),
                         const SizedBox(height: 24),
                         ElevatedButton(
-                          onPressed: () =>
-                              ref.invalidate(dailySummaryProvider),
+                          onPressed: () => ref.invalidate(dailySummaryProvider),
                           child: const Text('Retry'),
                         ),
                       ],
@@ -112,8 +118,9 @@ class DashboardScreen extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(vertical: 28),
                         decoration: BoxDecoration(
                           color: AppTheme.cardWhite,
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusLg),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLg,
+                          ),
                           boxShadow: AppTheme.cardShadow,
                         ),
                         child: ProgressRing(
@@ -161,8 +168,9 @@ class DashboardScreen extends ConsumerWidget {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: AppTheme.primary.withValues(alpha: 0.08),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusLg),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLg,
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -170,8 +178,7 @@ class DashboardScreen extends ConsumerWidget {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color:
-                                    AppTheme.primary.withValues(alpha: 0.15),
+                                color: AppTheme.primary.withValues(alpha: 0.15),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(

@@ -71,5 +71,6 @@ class UserProfile extends HiveObject {
   }
 
   @override
-  String toString() => 'UserProfile(id: $id, fullName: $fullName, email: $email)';
+  String toString() =>
+      'UserProfile(id: $id, fullName: $fullName, email: $email)';
 }

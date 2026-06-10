@@ -28,9 +28,9 @@ class InferenceRepository {
     required GeminiService geminiService,
     required NutritionLogRepository nutritionLogRepository,
     Uuid? uuid,
-  })  : _geminiService = geminiService,
-        _nutritionLogRepository = nutritionLogRepository,
-        _uuid = uuid ?? const Uuid();
+  }) : _geminiService = geminiService,
+       _nutritionLogRepository = nutritionLogRepository,
+       _uuid = uuid ?? const Uuid();
 
   /// Analyze a food image file and persist the results.
   ///
@@ -67,7 +67,8 @@ class InferenceRepository {
   /// Run inference only without persisting — returns the raw result.
   ///
   /// Useful for previewing inference before the user confirms logging.
-  Future<InferenceResult> analyzeOnly(Uint8List imageBytes, {
+  Future<InferenceResult> analyzeOnly(
+    Uint8List imageBytes, {
     String mimeType = 'image/jpeg',
   }) async {
     _log.info('Running inference preview (no persist)');

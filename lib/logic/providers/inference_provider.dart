@@ -67,9 +67,9 @@ class InferenceNotifier extends StateNotifier<InferenceState> {
 /// StateNotifierProvider for the inference pipeline.
 final inferenceNotifierProvider =
     StateNotifierProvider<InferenceNotifier, InferenceState>((ref) {
-  final repo = ref.watch(inferenceRepositoryProvider);
-  return InferenceNotifier(repo);
-});
+      final repo = ref.watch(inferenceRepositoryProvider);
+      return InferenceNotifier(repo);
+    });
 
 /// Sealed state class for the inference pipeline.
 ///

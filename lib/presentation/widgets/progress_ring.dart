@@ -50,7 +50,9 @@ class ProgressRing extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        remaining.toStringAsFixed(0).replaceAllMapped(
+                        remaining
+                            .toStringAsFixed(0)
+                            .replaceAllMapped(
                               RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
                               (m) => '${m[1]},',
                             ),
@@ -84,9 +86,9 @@ class ProgressRing extends StatelessWidget {
             _StatLabel(
               label: 'Consumed',
               value: consumed.toString().replaceAllMapped(
-                    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                    (m) => '${m[1]},',
-                  ),
+                RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                (m) => '${m[1]},',
+              ),
             ),
             Container(
               width: 1,
@@ -97,9 +99,9 @@ class ProgressRing extends StatelessWidget {
             _StatLabel(
               label: 'Goal',
               value: goal.toString().replaceAllMapped(
-                    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                    (m) => '${m[1]},',
-                  ),
+                RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                (m) => '${m[1]},',
+              ),
             ),
           ],
         ),

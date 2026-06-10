@@ -55,10 +55,7 @@ class SplashScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // App name
-            const Text(
-              'DietLog',
-              style: AppTheme.headingLarge,
-            ),
+            const Text('DietLog', style: AppTheme.headingLarge),
 
             const SizedBox(height: 8),
 

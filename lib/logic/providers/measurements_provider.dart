@@ -19,11 +19,7 @@ class UserMeasurements {
     this.age = 25,
   });
 
-  UserMeasurements copyWith({
-    double? heightCm,
-    double? weightKg,
-    int? age,
-  }) {
+  UserMeasurements copyWith({double? heightCm, double? weightKg, int? age}) {
     return UserMeasurements(
       heightCm: heightCm ?? this.heightCm,
       weightKg: weightKg ?? this.weightKg,
@@ -87,11 +83,7 @@ class MeasurementsNotifier extends StateNotifier<UserMeasurements> {
     required double weightKg,
     required int age,
   }) {
-    state = UserMeasurements(
-      heightCm: heightCm,
-      weightKg: weightKg,
-      age: age,
-    );
+    state = UserMeasurements(heightCm: heightCm, weightKg: weightKg, age: age);
     _saveToHive();
   }
 }
@@ -100,5 +92,5 @@ class MeasurementsNotifier extends StateNotifier<UserMeasurements> {
 /// Consumed by ProfileScreen to display dynamic height/weight/age values.
 final measurementsProvider =
     StateNotifierProvider<MeasurementsNotifier, UserMeasurements>((ref) {
-  return MeasurementsNotifier();
-});
+      return MeasurementsNotifier();
+    });

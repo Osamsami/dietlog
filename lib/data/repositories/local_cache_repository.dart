@@ -103,11 +103,8 @@ class LocalCacheRepository {
 
   /// Get total cache size info (number of entries per box).
   Map<String, int> get cacheStats => {
-        'nutritionLogs':
-            Hive.box<NutritionLog>(HiveBoxes.nutritionLogs).length,
-        'userProfile':
-            Hive.box<UserProfile>(HiveBoxes.userProfile).length,
-        'appSettings':
-            Hive.box(HiveBoxes.appSettings).length,
-      };
+    'nutritionLogs': Hive.box<NutritionLog>(HiveBoxes.nutritionLogs).length,
+    'userProfile': Hive.box<UserProfile>(HiveBoxes.userProfile).length,
+    'appSettings': Hive.box(HiveBoxes.appSettings).length,
+  };
 }

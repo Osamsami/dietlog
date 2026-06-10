@@ -12,15 +12,9 @@ class UserPreferences {
   final int calorieGoal;
   final double waterGoalLiters;
 
-  const UserPreferences({
-    this.calorieGoal = 2000,
-    this.waterGoalLiters = 3.2,
-  });
+  const UserPreferences({this.calorieGoal = 2000, this.waterGoalLiters = 3.2});
 
-  UserPreferences copyWith({
-    int? calorieGoal,
-    double? waterGoalLiters,
-  }) {
+  UserPreferences copyWith({int? calorieGoal, double? waterGoalLiters}) {
     return UserPreferences(
       calorieGoal: calorieGoal ?? this.calorieGoal,
       waterGoalLiters: waterGoalLiters ?? this.waterGoalLiters,
@@ -84,5 +78,5 @@ class UserPreferencesNotifier extends StateNotifier<UserPreferences> {
 /// Consumed by the Dashboard (via dailySummaryProvider) and the Profile screen.
 final userPreferencesProvider =
     StateNotifierProvider<UserPreferencesNotifier, UserPreferences>((ref) {
-  return UserPreferencesNotifier();
-});
+      return UserPreferencesNotifier();
+    });

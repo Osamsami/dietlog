@@ -138,13 +138,18 @@ class _UnitOption extends StatelessWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: (isSelected ? AppTheme.primaryDark : AppTheme.textSecondary)
-                    .withValues(alpha: 0.1),
+                color:
+                    (isSelected ? AppTheme.primaryDark : AppTheme.textSecondary)
+                        .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               ),
-              child: Icon(icon,
-                  color: isSelected ? AppTheme.primaryDark : AppTheme.textSecondary,
-                  size: 22),
+              child: Icon(
+                icon,
+                color: isSelected
+                    ? AppTheme.primaryDark
+                    : AppTheme.textSecondary,
+                size: 22,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(

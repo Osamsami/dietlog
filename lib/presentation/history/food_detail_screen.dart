@@ -21,8 +21,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final log =
-        ModalRoute.of(context)!.settings.arguments as NutritionLog;
+    final log = ModalRoute.of(context)!.settings.arguments as NutritionLog;
 
     // Scale values by serving multiplier
     final scaledCalories = (log.calories * _servings).round();
@@ -50,16 +49,21 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.share_outlined,
-                color: AppTheme.textSecondary),
+            icon: const Icon(
+              Icons.share_outlined,
+              color: AppTheme.textSecondary,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: CircleAvatar(
               radius: 16,
               backgroundColor: AppTheme.primary.withValues(alpha: 0.15),
-              child: const Icon(Icons.person,
-                  color: AppTheme.primaryDark, size: 18),
+              child: const Icon(
+                Icons.person,
+                color: AppTheme.primaryDark,
+                size: 18,
+              ),
             ),
           ),
         ],
@@ -78,8 +82,11 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                     color: AppTheme.primary.withValues(alpha: 0.06),
                   ),
                   child: const Center(
-                    child: Icon(Icons.restaurant,
-                        size: 60, color: AppTheme.primary),
+                    child: Icon(
+                      Icons.restaurant,
+                      size: 60,
+                      color: AppTheme.primary,
+                    ),
                   ),
                 ),
                 Positioned(
@@ -87,7 +94,9 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                   left: 16,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: AppTheme.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
@@ -118,8 +127,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(log.foodName,
-                                style: AppTheme.headingMedium),
+                            Text(log.foodName, style: AppTheme.headingMedium),
                             const SizedBox(height: 4),
                             Text(
                               '${log.servingSizeEstimate ?? 'Serving'} • ${DateFormatter.time(log.loggedAt)}',
@@ -182,11 +190,12 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                   const SizedBox(height: 14),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: AppTheme.cardWhite,
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.radiusLg),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                       boxShadow: AppTheme.cardShadow,
                     ),
                     child: Row(
@@ -210,8 +219,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         ),
                         _PortionButton(
                           icon: Icons.add,
-                          onTap: () =>
-                              setState(() => _servings += 0.5),
+                          onTap: () => setState(() => _servings += 0.5),
                         ),
                       ],
                     ),
@@ -224,15 +232,16 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: AppTheme.cardWhite,
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.radiusLg),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                       boxShadow: AppTheme.cardShadow,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Nutritional Information',
-                            style: AppTheme.headingSmall),
+                        const Text(
+                          'Nutritional Information',
+                          style: AppTheme.headingSmall,
+                        ),
                         const SizedBox(height: 16),
                         _NutrientRow(
                           icon: Icons.local_fire_department_outlined,
@@ -243,22 +252,19 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         _NutrientRow(
                           icon: Icons.fitness_center,
                           label: 'Protein',
-                          value:
-                              '${scaledProtein.toStringAsFixed(1)}g',
+                          value: '${scaledProtein.toStringAsFixed(1)}g',
                         ),
                         const Divider(color: AppTheme.divider),
                         _NutrientRow(
                           icon: Icons.grain,
                           label: 'Carbohydrates',
-                          value:
-                              '${scaledCarbs.toStringAsFixed(1)}g',
+                          value: '${scaledCarbs.toStringAsFixed(1)}g',
                         ),
                         const Divider(color: AppTheme.divider),
                         _NutrientRow(
                           icon: Icons.water_drop_outlined,
                           label: 'Fats',
-                          value:
-                              '${scaledFats.toStringAsFixed(1)}g',
+                          value: '${scaledFats.toStringAsFixed(1)}g',
                         ),
                         const Divider(color: AppTheme.divider),
                         _NutrientRow(
@@ -280,8 +286,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                     children: [
                       if (scaledProtein > 15)
                         const NutrientTag(label: 'High Protein'),
-                      if (scaledFats < 10)
-                        const NutrientTag(label: 'Low Fat'),
+                      if (scaledFats < 10) const NutrientTag(label: 'Low Fat'),
                       if (scaledCarbs < 30)
                         const NutrientTag(label: 'Low Carb'),
                       const NutrientTag(label: 'AI Analyzed'),
@@ -310,7 +315,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
-                              AppTheme.radiusRound),
+                            AppTheme.radiusRound,
+                          ),
                         ),
                       ),
                     ),

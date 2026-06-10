@@ -53,7 +53,9 @@ class _MeasurementsUpdaterState extends ConsumerState<MeasurementsUpdater> {
   void _save() {
     if (!_formKey.currentState!.validate()) return;
 
-    ref.read(measurementsProvider.notifier).updateAll(
+    ref
+        .read(measurementsProvider.notifier)
+        .updateAll(
           heightCm: double.parse(_heightCtrl.text.trim()),
           weightKg: double.parse(_weightCtrl.text.trim()),
           age: int.parse(_ageCtrl.text.trim()),
@@ -135,8 +137,9 @@ class _MeasurementsUpdaterState extends ConsumerState<MeasurementsUpdater> {
             // ── Weight ─────────────────────────────────────────────────────
             TextFormField(
               controller: _weightCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[\d.]')),
               ],

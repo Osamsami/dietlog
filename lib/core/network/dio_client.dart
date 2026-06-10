@@ -21,9 +21,7 @@ class DioClient {
         receiveTimeout: const Duration(
           milliseconds: AppConstants.httpTimeoutMs,
         ),
-        sendTimeout: const Duration(
-          milliseconds: AppConstants.httpTimeoutMs,
-        ),
+        sendTimeout: const Duration(milliseconds: AppConstants.httpTimeoutMs),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -64,7 +62,11 @@ class DioClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) {
-    return _dio.get<T>(path, queryParameters: queryParameters, options: options);
+    return _dio.get<T>(
+      path,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   /// Perform a POST request.
@@ -74,25 +76,21 @@ class DioClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) {
-    return _dio.post<T>(path,
-        data: data, queryParameters: queryParameters, options: options);
+    return _dio.post<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   /// Perform a PUT request.
-  Future<Response<T>> put<T>(
-    String path, {
-    dynamic data,
-    Options? options,
-  }) {
+  Future<Response<T>> put<T>(String path, {dynamic data, Options? options}) {
     return _dio.put<T>(path, data: data, options: options);
   }
 
   /// Perform a DELETE request.
-  Future<Response<T>> delete<T>(
-    String path, {
-    dynamic data,
-    Options? options,
-  }) {
+  Future<Response<T>> delete<T>(String path, {dynamic data, Options? options}) {
     return _dio.delete<T>(path, data: data, options: options);
   }
 }

@@ -74,5 +74,6 @@ class DateFormatter {
   static DateTime startOfMonth() => daysAgo(30);
 
   /// Converts a [DateTime] to an ISO 8601 string suitable for Supabase queries.
-  static String toSupabaseTimestamp(DateTime dt) => dt.toUtc().toIso8601String();
+  static String toSupabaseTimestamp(DateTime dt) =>
+      dt.toUtc().toIso8601String();
 }

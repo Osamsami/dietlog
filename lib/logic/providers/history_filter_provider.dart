@@ -21,8 +21,9 @@ final historyFilterProvider = StateProvider<HistoryFilter>((ref) {
 
 /// Computed provider that returns filtered/sorted nutrition logs
 /// based on the current [historyFilterProvider] selection.
-final filteredLogsProvider =
-    AutoDisposeFutureProvider<List<NutritionLog>>((ref) async {
+final filteredLogsProvider = AutoDisposeFutureProvider<List<NutritionLog>>((
+  ref,
+) async {
   final filter = ref.watch(historyFilterProvider);
 
   switch (filter) {

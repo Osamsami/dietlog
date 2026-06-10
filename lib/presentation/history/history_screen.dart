@@ -56,17 +56,19 @@ class HistoryScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
 
-            ...HistoryFilter.values.map((filter) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: _FilterOption(
-                    filter: filter,
-                    isSelected: filter == current,
-                    onTap: () {
-                      ref.read(historyFilterProvider.notifier).state = filter;
-                      Navigator.pop(context);
-                    },
-                  ),
-                )),
+            ...HistoryFilter.values.map(
+              (filter) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: _FilterOption(
+                  filter: filter,
+                  isSelected: filter == current,
+                  onTap: () {
+                    ref.read(historyFilterProvider.notifier).state = filter;
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -88,20 +90,23 @@ class HistoryScreen extends ConsumerWidget {
           children: [
             // ── Header ──────────────────────────────────────────────────
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.pushNamed(context, '/profile'),
                     child: CircleAvatar(
                       radius: 22,
-                      backgroundColor:
-                          AppTheme.primary.withValues(alpha: 0.15),
-                      backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                      backgroundColor: AppTheme.primary.withValues(alpha: 0.15),
+                      backgroundImage: avatarUrl != null
+                          ? NetworkImage(avatarUrl)
+                          : null,
                       child: avatarUrl == null
-                          ? const Icon(Icons.person,
-                              color: AppTheme.primaryDark, size: 22)
+                          ? const Icon(
+                              Icons.person,
+                              color: AppTheme.primaryDark,
+                              size: 22,
+                            )
                           : null,
                     ),
                   ),
@@ -118,9 +123,12 @@ class HistoryScreen extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.pushNamed(context, '/notifications'),
-                    icon: const Icon(Icons.notifications_none_rounded,
-                        color: AppTheme.textSecondary),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/notifications'),
+                    icon: const Icon(
+                      Icons.notifications_none_rounded,
+                      color: AppTheme.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -145,15 +153,16 @@ class HistoryScreen extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Text('Meal History',
-                          style: AppTheme.headingLarge),
+                      const Text('Meal History', style: AppTheme.headingLarge),
                       const Spacer(),
                       GestureDetector(
                         onTap: () => _showFilterSheet(context, ref),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 6),
+                            horizontal: 14,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: activeFilter != HistoryFilter.today
                                 ? AppTheme.primary.withValues(alpha: 0.1)
@@ -203,22 +212,23 @@ class HistoryScreen extends ConsumerWidget {
               child: logsAsync.when(
                 loading: () => const Center(
                   child: CircularProgressIndicator(
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                    valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
                   ),
                 ),
                 error: (error, _) => Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline,
-                          size: 48, color: AppTheme.error),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: AppTheme.error,
+                      ),
                       const SizedBox(height: 12),
                       Text(error.toString(), style: AppTheme.bodySmall),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () =>
-                            ref.invalidate(filteredLogsProvider),
+                        onPressed: () => ref.invalidate(filteredLogsProvider),
                         child: const Text('Retry'),
                       ),
                     ],
@@ -230,10 +240,13 @@ class HistoryScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.restaurant_menu,
-                              size: 64,
-                              color: AppTheme.textSecondary
-                                  .withValues(alpha: 0.3)),
+                          Icon(
+                            Icons.restaurant_menu,
+                            size: 64,
+                            color: AppTheme.textSecondary.withValues(
+                              alpha: 0.3,
+                            ),
+                          ),
                           const SizedBox(height: 16),
                           Text(
                             'No meals found',
@@ -272,8 +285,9 @@ class HistoryScreen extends ConsumerWidget {
                               Text(
                                 'End of ${activeFilter.label.toLowerCase()} log',
                                 style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.textSecondary
-                                      .withValues(alpha: 0.5),
+                                  color: AppTheme.textSecondary.withValues(
+                                    alpha: 0.5,
+                                  ),
                                 ),
                               ),
                             ],
@@ -362,8 +376,11 @@ class _FilterOption extends StatelessWidget {
             ),
             const Spacer(),
             if (isSelected)
-              const Icon(Icons.check_circle,
-                  size: 20, color: AppTheme.primaryDark),
+              const Icon(
+                Icons.check_circle,
+                size: 20,
+                color: AppTheme.primaryDark,
+              ),
           ],
         ),
       ),

@@ -92,10 +92,7 @@ class MacroCard extends StatelessWidget {
             },
           ),
           const SizedBox(height: 8),
-          Text(
-            'Goal: ${goal.toStringAsFixed(0)}g',
-            style: AppTheme.caption,
-          ),
+          Text('Goal: ${goal.toStringAsFixed(0)}g', style: AppTheme.caption),
         ],
       ),
     );

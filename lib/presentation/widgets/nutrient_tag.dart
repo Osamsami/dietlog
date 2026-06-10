@@ -9,11 +9,7 @@ class NutrientTag extends StatelessWidget {
   final String label;
   final Color? color;
 
-  const NutrientTag({
-    super.key,
-    required this.label,
-    this.color,
-  });
+  const NutrientTag({super.key, required this.label, this.color});
 
   @override
   Widget build(BuildContext context) {

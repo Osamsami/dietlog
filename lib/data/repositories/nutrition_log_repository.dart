@@ -17,7 +17,7 @@ class NutritionLogRepository {
   final SupabaseClient _client;
 
   NutritionLogRepository({SupabaseClient? client})
-      : _client = client ?? Supabase.instance.client;
+    : _client = client ?? Supabase.instance.client;
 
   /// Reference to the Hive cache box for nutrition logs.
   Box<NutritionLog> get _cacheBox =>
@@ -54,9 +54,7 @@ class NutritionLogRepository {
     DateTime? endDate,
   }) async {
     try {
-      var query = _client
-          .from('nutrition_logs')
-          .select();
+      var query = _client.from('nutrition_logs').select();
 
       if (startDate != null) {
         query = query.gte(
@@ -130,7 +128,10 @@ class NutritionLogRepository {
       targetDate.year,
       targetDate.month,
       targetDate.day,
-      23, 59, 59, 999,
+      23,
+      59,
+      59,
+      999,
     );
 
     final logs = await getLogs(startDate: start, endDate: end);
@@ -155,10 +156,7 @@ class NutritionLogRepository {
   }
 
   /// Retrieve logs from the Hive cache, optionally filtered by date range.
-  List<NutritionLog> _getCachedLogs({
-    DateTime? startDate,
-    DateTime? endDate,
-  }) {
+  List<NutritionLog> _getCachedLogs({DateTime? startDate, DateTime? endDate}) {
     var logs = _cacheBox.values.toList();
 
     if (startDate != null) {

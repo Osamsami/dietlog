@@ -13,11 +13,7 @@ class MealLogCard extends StatelessWidget {
   final NutritionLog log;
   final VoidCallback? onTap;
 
-  const MealLogCard({
-    super.key,
-    required this.log,
-    this.onTap,
-  });
+  const MealLogCard({super.key, required this.log, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -103,12 +99,9 @@ class MealLogCard extends StatelessWidget {
                   Wrap(
                     spacing: 6,
                     children: [
-                      if (log.proteinG > 0)
-                        const NutrientTag(label: 'Protein'),
-                      if (log.carbsG > 0)
-                        const NutrientTag(label: 'Carbs'),
-                      if (log.fatsG > 0)
-                        const NutrientTag(label: 'Fats'),
+                      if (log.proteinG > 0) const NutrientTag(label: 'Protein'),
+                      if (log.carbsG > 0) const NutrientTag(label: 'Carbs'),
+                      if (log.fatsG > 0) const NutrientTag(label: 'Fats'),
                     ],
                   ),
                 ],

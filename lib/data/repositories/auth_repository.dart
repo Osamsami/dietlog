@@ -18,7 +18,7 @@ class AuthRepository {
   final SupabaseClient _client;
 
   AuthRepository({SupabaseClient? client})
-      : _client = client ?? Supabase.instance.client;
+    : _client = client ?? Supabase.instance.client;
 
   // ── Sign Up ─────────────────────────────────────────────────────────────
 
@@ -94,8 +94,7 @@ class AuthRepository {
   /// Stream of authentication state changes.
   ///
   /// Emits events for sign-in, sign-out, token refresh, etc.
-  Stream<AuthState> get onAuthStateChange =>
-      _client.auth.onAuthStateChange;
+  Stream<AuthState> get onAuthStateChange => _client.auth.onAuthStateChange;
 
   // ── Profile Operations ──────────────────────────────────────────────────
 
@@ -161,12 +160,11 @@ class AuthRepository {
 
     final file = File(localPath);
     final fileExt = localPath.split('.').last;
-    final fileName = '${user.id}.${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+    final fileName =
+        '${user.id}.${DateTime.now().millisecondsSinceEpoch}.$fileExt';
 
     // Upload to 'profile-pictures' bucket
-    await _client.storage
-        .from('profile-pictures')
-        .upload(fileName, file);
+    await _client.storage.from('profile-pictures').upload(fileName, file);
 
     // Get public URL
     final publicUrl = _client.storage
@@ -175,9 +173,7 @@ class AuthRepository {
 
     // Update Supabase Auth metadata
     await _client.auth.updateUser(
-      UserAttributes(
-        data: {'avatar_url': publicUrl},
-      ),
+      UserAttributes(data: {'avatar_url': publicUrl}),
     );
 
     // Also update profiles table if supported
