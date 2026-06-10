@@ -25,70 +25,99 @@
 
 <h1 align="center">DietLog: AI-Powered Nutrition Orchestration</h1>
 
-DietLog is a high-fidelity Health & Fitness platform designed to bridge the gap between complex nutritional tracking and seamless user experience. It transforms live camera feeds into actionable dietary intelligence using multimodal AI analysis and deterministic state management.
+<p align="center">
+  <strong>A production-grade, high-fidelity Health & Fitness platform built with Clean Architecture, leveraging multimodal AI analysis and deterministic state management to automate dietary logging.</strong>
+</p>
 
 ---
 
 ## 🚀 Project Perspective
 
 ### What is DietLog?
-DietLog is a premium AI orchestration engine for automated nutrition logging. It moves beyond manual calorie counting by providing deep technical insights into user meals, allowing users to understand their macro-nutritional intake simply by pointing their device camera at their food.
+DietLog is an enterprise-tier AI orchestration engine for automated nutrition logging. It bypasses conventional manual calorie tracking by translating raw multi-resolution camera streams into real-time, actionable macro-nutritional telemetry.
 
-### Core Capabilities
-* **Multimodal Feature Extraction:** Analyzes live camera frames utilizing the `gemini-2.0-flash` model via Base64 payload encoding to accurately identify food items.
-* **Strict Schema Inference:** Enforces a rigid JSON guardrail on the Large Language Model (LLM) to extract highly structured macro-nutritional data (Calories, Proteins, Carbs, Fats) with calculated confidence scores.
-* **Synchronous Cloud Authentication:** Utilizes Supabase Auth with cached session pointers to ensure zero-latency routing and secure inference pipeline execution.
-* **Hybrid Data Persistence:** Combines local Hive NoSQL caching for instantaneous metric loads with secure Supabase PostgreSQL storage for cloud-synced nutrition logs.
-* **Real-time UX Updates:** Implements Riverpod StateNotifier streams for reactive, lag-free UI state synchronization during asynchronous database operations.
+### Core Technical Capabilities
+* **Multimodal Feature Extraction:** Streams client-side compressed camera/gallery frames to the Gemini Vision API via optimized Base64 payloads to instantly evaluate diverse food items.
+* **Strict Schema Inference:** Enforces rigid `responseSchema` guardrails directly on the LLM runtime to guarantee the extraction of structured JSON telemetry (Calories, Proteins, Carbs, Fats) with runtime validation scores.
+* **Type-Safe Fail-Safes:** Implements highly resilient deserialization hooks within the data transition layer to prevent system crashes caused by dynamic runtime casting errors (`int` vs `double`).
+* **Synchronous Cloud Authentication:** Utilizes Supabase Auth with cached session pointers to ensure zero-latency application routing and encrypted asset access control.
+* **Hybrid Data Persistence Layer:** Syncs local NoSQL Hive caching engines for instant offline data rehydration alongside persistent remote Supabase PostgreSQL storage buckets.
+* **Deterministic Local Time Matching:** Bypasses distributed cloud timezone/UTC discrepancies using explicit device-side date element evaluations (`year, month, day`) to power real-time historical filtering.
 
 ---
 
 ## 🛠 Architecture & Tech Stack
 
-Built on a robust **Clean Architecture** utilizing the Repository Pattern to maintain strict separation of concerns across the Presentation, Logic, and Data layers.
+```mermaid
+graph TD
+    A[Camera/Gallery Client] -->|Compressed Image Stream| B[Riverpod InferenceProvider]
+    B -->|Base64 Payload with responseSchema| C[Gemini Vision API]
+    C -->|Strict JSON Object| D[Custom Type-Safe Deserializers]
+    D -->|Validated InferenceResult DTO| E[Nutrition Log Controller]
+    E -->|Deterministic Date Component Sync| F[Local Cache Hive]
+    E -->|Persistent Storage Cloud| G[Supabase Database]
+```
 
-* **Frontend Engineering:** Flutter (Mobile), Dart, Riverpod (State Management), Camera & Image Picker plugins.
-* **AI & Machine Learning Engine:** Google Gemini Vision API (Multimodal LLM Inference via Dio HTTP Client).
-* **Backend Infrastructure (BaaS):** Supabase (PostgreSQL, JWT Authentication, Cloud Storage).
-* **Local Caching:** Hive (NoSQL, Encrypted Key-Value pairs).
-* **Database Security:** Row-Level Security (RLS) on storage buckets ensuring strict `authenticated` access only.
+Built strictly upon the fundamentals of **Clean Architecture** combined with the **Repository Pattern** to split systemic concerns cleanly across decoupled layers:
+
+* **Frontend & State Topology:** Cross-platform Flutter engine powered by declarative Riverpod data streams and reactive StateNotifiers.
+* **AI & Inference Pipeline:** Google Gemini Vision API executing network telemetry through structured Dio client layers.
+* **Backend Infrastructure (BaaS):** Supabase orchestration featuring real-time relational PostgreSQL databases, Row-Level Security (RLS) policies, and secure bucket storage.
+* **Caching & Local Querying:** Lightweight Hive local memory registers managing instant cryptographic key-value pair transactions.
 
 ---
 
-## ⚙️ Deployment & Execution
+## 📂 System Directory Layout
 
-### Prerequisites
-* Flutter SDK (3.x.x+)
-* Dart SDK
-* Supabase Project (Database & Storage configured with strict RLS policies)
-* Google Gemini API Key
+```text
+lib/
+├── core/                  # Shared system drivers, design configurations, and network engines
+│   ├── network/           # Gemini API gateways and network clients
+│   └── utils/             # Cryptographic operations, formatters, and global constraints
+├── data/                  # Abstract configurations and raw state management engines
+│   ├── models/            # Data Transfer Objects (DTOs) and type-safe data deserializers
+│   └── repositories/      # Implementations of cloud/local concrete persistence layer actions
+├── logic/                 # High-level business behavior rule configurations
+│   └── providers/         # Riverpod dependency graphs and filter state streams
+└── presentation/          # Decoupled UI controls and view-model tracking layers
+    ├── dashboard/         # Real-time state metrics UI and camera canvas streams
+    ├── history/           # Log evaluation views and analytical graphs
+    └── profile/           # Local account data preferences and system key maps
+```
 
-### Build Instructions
+---
 
-1. **Clone the repository**
-```bash
+## ⚙️ Deployment & Compilation Pipeline
+
+### System Prerequisites
+* **Flutter SDK:** Version 3.x.x+ (Stable Channel)
+* **Dart SDK:** Configured within system paths
+* **Database Infrastructure:** Configured Supabase project containing operational storage buckets and database schemas
+
+### Compilation Sequence
+
+1. **Clone and Initialize Environment Workspace**
+   ```bash
    git clone [https://github.com/Osamsami/dietlog.git](https://github.com/Osamsami/dietlog.git)
    cd dietlog
    ```
 
-2. **Fetch Dependencies**
-```bash
+2. **Acquire Package Signatures**
+   ```bash
    flutter pub get
    ```
 
-3. **Environment Configuration**
-   Create a `.env` file in the root directory to securely inject credentials:
-```env
+3. **Establish Runtime Environment** Generate a secure configuration file named `.env` in the root repository path:
+   ```env
    SUPABASE_URL="[https://your-project.supabase.co](https://your-project.supabase.co)"
    SUPABASE_ANON_KEY="your-anon-key"
    GEMINI_API_KEY="your-gemini-key"
    ```
 
-4. **Compile & Run**
-```bash
-   flutter run
+4. **Execute Native Production Compilations** To build an optimized, highly performant Android release binary featuring Ahead-Of-Time (AOT) compiler optimizations, run:
+   ```bash
+   flutter build apk --release
    ```
-   *(For optimized production execution with Ahead-Of-Time compilation, execute `flutter build apk --release`)*
 
 ---
 
@@ -96,10 +125,11 @@ Built on a robust **Clean Architecture** utilizing the Repository Pattern to mai
 
 The DietLog ecosystem was architected with a strict focus on high-precision state management, secure database interactions, and seamless AI workflows.
 
-* **Osam Sami** - *System Architect & AI/ML Lead* 
+* **Osam Sami** - *System Architect & AI/ML Lead*
   * Engineered the generative AI Inference Pipeline, implemented Clean Architecture scaffolding, and deployed the Cloud Database Infrastructure.
 
+---
 <div align="center">
-  <br/>
   <i>DietLog: Precision in Every Pixel, Nutrition in Every Scan.</i>
 </div>
+```
