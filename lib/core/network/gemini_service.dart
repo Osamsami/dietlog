@@ -13,7 +13,7 @@ class GeminiService {
   static const String _baseUrl =
       'https://generativelanguage.googleapis.com/v1beta';
 
-  static const String _model = 'gemini-1.5-flash';
+  static const String _model = 'gemini-3.5-flash';
 
   final Dio _dio;
 
@@ -47,10 +47,16 @@ The JSON MUST match this exact schema:
     final base64Image = base64Encode(imageBytes);
 
     final requestBody = {
+      'systemInstruction': {
+        'parts': [
+          {
+            'text': _systemPrompt,
+          }, // Tumhara original prompt standard instructions mein chala gaya
+        ],
+      },
       'contents': [
         {
           'parts': [
-            {'text': _systemPrompt},
             {
               'inlineData': {'mimeType': mimeType, 'data': base64Image},
             },
@@ -59,9 +65,28 @@ The JSON MUST match this exact schema:
       ],
       'generationConfig': {
         'temperature': 0.1,
-        'topP': 0.8,
-        'maxOutputTokens': 512,
         'responseMimeType': 'application/json',
+        'responseSchema': {
+          'type': 'OBJECT',
+          'properties': {
+            'food_item_identified': {'type': 'STRING'},
+            'confidence_score': {'type': 'NUMBER'},
+            'calories_kcal': {'type': 'INTEGER'},
+            'proteins_grams': {'type': 'NUMBER'},
+            'carbohydrates_grams': {'type': 'NUMBER'},
+            'fats_grams': {'type': 'NUMBER'},
+            'serving_size_estimate': {'type': 'STRING'},
+          },
+          'required': [
+            'food_item_identified',
+            'confidence_score',
+            'calories_kcal',
+            'proteins_grams',
+            'carbohydrates_grams',
+            'fats_grams',
+            'serving_size_estimate',
+          ],
+        },
       },
     };
 

@@ -2,6 +2,19 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'inference_result.g.dart';
 
+// Top-level safe parsing helpers to prevent runtime type-casting crashes
+double _safeDouble(dynamic value) {
+  if (value == null) return 0.0;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString()) ?? 0.0;
+}
+
+int _safeInt(dynamic value) {
+  if (value == null) return 0;
+  if (value is num) return value.toInt();
+  return int.tryParse(value.toString()) ?? 0;
+}
+
 /// Represents the structured JSON response from the Gemini Vision
 /// inference pipeline.
 ///
@@ -9,19 +22,6 @@ part 'inference_result.g.dart';
 /// in the project specification (Section 3). It is NOT persisted in
 /// Hive — it is a transient object used to bridge the inference
 /// response to a [NutritionLog] entry.
-///
-/// Schema enforced on the LLM:
-/// ```json
-/// {
-///   "food_item_identified": "String",
-///   "confidence_score": "Float",
-///   "calories_kcal": "Integer",
-///   "proteins_grams": "Float",
-///   "carbohydrates_grams": "Float",
-///   "fats_grams": "Float",
-///   "serving_size_estimate": "String"
-/// }
-/// ```
 @JsonSerializable()
 class InferenceResult {
   /// The food item name identified by the vision model.
@@ -29,23 +29,23 @@ class InferenceResult {
   final String foodItemIdentified;
 
   /// Model confidence score (0.0–1.0).
-  @JsonKey(name: 'confidence_score')
+  @JsonKey(name: 'confidence_score', fromJson: _safeDouble)
   final double confidenceScore;
 
   /// Estimated calorie count in kcal.
-  @JsonKey(name: 'calories_kcal')
+  @JsonKey(name: 'calories_kcal', fromJson: _safeInt)
   final int caloriesKcal;
 
   /// Estimated protein content in grams.
-  @JsonKey(name: 'proteins_grams')
+  @JsonKey(name: 'proteins_grams', fromJson: _safeDouble)
   final double proteinsGrams;
 
   /// Estimated carbohydrate content in grams.
-  @JsonKey(name: 'carbohydrates_grams')
+  @JsonKey(name: 'carbohydrates_grams', fromJson: _safeDouble)
   final double carbohydratesGrams;
 
   /// Estimated fat content in grams.
-  @JsonKey(name: 'fats_grams')
+  @JsonKey(name: 'fats_grams', fromJson: _safeDouble)
   final double fatsGrams;
 
   /// Estimated serving size description.
