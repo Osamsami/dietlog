@@ -6,8 +6,7 @@ import 'user_preferences_provider.dart';
 
 /// Provides the [NutritionLogRepository] singleton instance.
 /// Encapsulates all Supabase + Hive CRUD operations for nutrition logs.
-final nutritionLogRepositoryProvider =
-    Provider<NutritionLogRepository>((ref) {
+final nutritionLogRepositoryProvider = Provider<NutritionLogRepository>((ref) {
   return NutritionLogRepository();
 });
 
@@ -15,22 +14,33 @@ final nutritionLogRepositoryProvider =
 ///
 /// Auto-disposes when no longer listened to, ensuring fresh data on re-read.
 /// Consumed by the History screen (via filteredLogsProvider) and Dashboard.
-final todayLogsProvider =
-    AutoDisposeFutureProvider<List<NutritionLog>>((ref) async {
+final todayLogsProvider = AutoDisposeFutureProvider<List<NutritionLog>>((
+  ref,
+) async {
   final repo = ref.watch(nutritionLogRepositoryProvider);
-  return repo.getTodayLogs();
+  final allLogs = await repo.getWeeklyLogs();
+
+  final now = DateTime.now();
+  return allLogs.where((log) {
+    final localDate = log.loggedAt.toLocal();
+    return localDate.year == now.year &&
+        localDate.month == now.month &&
+        localDate.day == now.day;
+  }).toList();
 });
 
 /// FutureProvider for the last 7 days of nutrition logs.
-final weeklyLogsProvider =
-    AutoDisposeFutureProvider<List<NutritionLog>>((ref) async {
+final weeklyLogsProvider = AutoDisposeFutureProvider<List<NutritionLog>>((
+  ref,
+) async {
   final repo = ref.watch(nutritionLogRepositoryProvider);
   return repo.getWeeklyLogs();
 });
 
 /// FutureProvider for the last 30 days of nutrition logs.
-final monthlyLogsProvider =
-    AutoDisposeFutureProvider<List<NutritionLog>>((ref) async {
+final monthlyLogsProvider = AutoDisposeFutureProvider<List<NutritionLog>>((
+  ref,
+) async {
   final repo = ref.watch(nutritionLogRepositoryProvider);
   return repo.getMonthlyLogs();
 });
@@ -41,20 +51,23 @@ final monthlyLogsProvider =
 /// instead of hardcoded AppConstants. This means when the user updates
 /// their goals in the Profile screen, the Dashboard progress ring
 /// updates reactively via Riverpod's dependency graph.
-final dailySummaryProvider =
-    AutoDisposeFutureProvider<DailySummary>((ref) async {
+final dailySummaryProvider = AutoDisposeFutureProvider<DailySummary>((
+  ref,
+) async {
   final logsAsync = await ref.watch(todayLogsProvider.future);
   // Read dynamic user goals — reactively rebuilds when goals change
   final prefs = ref.watch(userPreferencesProvider);
 
-  final totalCalories =
-      logsAsync.fold<int>(0, (sum, log) => sum + log.calories);
-  final totalProtein =
-      logsAsync.fold<double>(0, (sum, log) => sum + log.proteinG);
-  final totalCarbs =
-      logsAsync.fold<double>(0, (sum, log) => sum + log.carbsG);
-  final totalFats =
-      logsAsync.fold<double>(0, (sum, log) => sum + log.fatsG);
+  final totalCalories = logsAsync.fold<int>(
+    0,
+    (sum, log) => sum + log.calories,
+  );
+  final totalProtein = logsAsync.fold<double>(
+    0,
+    (sum, log) => sum + log.proteinG,
+  );
+  final totalCarbs = logsAsync.fold<double>(0, (sum, log) => sum + log.carbsG);
+  final totalFats = logsAsync.fold<double>(0, (sum, log) => sum + log.fatsG);
 
   return DailySummary(
     totalCalories: totalCalories,
@@ -105,12 +118,10 @@ class DailySummary {
       proteinTarget > 0 ? totalProtein / proteinTarget : 0;
 
   /// Carbs progress as a fraction.
-  double get carbsProgress =>
-      carbsTarget > 0 ? totalCarbs / carbsTarget : 0;
+  double get carbsProgress => carbsTarget > 0 ? totalCarbs / carbsTarget : 0;
 
   /// Fats progress as a fraction.
-  double get fatsProgress =>
-      fatsTarget > 0 ? totalFats / fatsTarget : 0;
+  double get fatsProgress => fatsTarget > 0 ? totalFats / fatsTarget : 0;
 
   /// Remaining calories to reach the daily target.
   int get remainingCalories => calorieTarget - totalCalories;
