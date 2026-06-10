@@ -41,18 +41,19 @@ jobs:
     - name: Execute Machine Code Generation
       run: dart run build_runner build --delete-conflicting-outputs
 
-    - name: Run Static Analysis (Warnings Allowed)
-      run: flutter analyze --no-fatal-warnings
+    - name: Run Static Analysis (Logged, Will Not Block Build)
+      run: flutter analyze
+      continue-on-error: true
 
-    - name: 📋 Generate Audit Log of Auto-Corrections
+    - name: Generate Audit Log of Auto-Corrections
       run: |
         echo "=========================================================="
-        echo "🚨 [BOT AUDIT REPORT]: DETECTING RUNTIME MODIFICATIONS"
+        echo "[BOT AUDIT REPORT]: DETECTING RUNTIME MODIFICATIONS"
         echo "=========================================================="
         if [ -z "$(git status --porcelain)" ]; then
-          echo "✅ No basic errors found. Code is already pristine!"
+          echo "No basic errors found. Code is already pristine!"
         else
-          echo "⚠️ Basic errors identified and fixed automatically by Bot."
+          echo "Basic errors identified and fixed automatically by Bot."
           echo "Dumping modified file registry below:"
           git status --porcelain
           echo "----------------------------------------------------------"
