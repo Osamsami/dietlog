@@ -27,11 +27,11 @@ jobs:
     - name: Install Project Dependencies
       run: flutter pub get
 
-    - name: Run Build Runner (Generate Missing Type-Safe Files)
-      run: dart run build_runner build --delete-conflicting-outputs
-
-    - name: Verify Code Formatting
+    - name: Verify Human Code Formatting (Before Generation)
       run: dart format --output=none --set-exit-if-changed lib/
+
+    - name: Run Build Runner (Generate Machine Code)
+      run: dart run build_runner build --delete-conflicting-outputs
 
     - name: Static Code Analysis (Linter check)
       run: flutter analyze
