@@ -26,6 +26,12 @@
 <h1 align="center">DietLog: AI-Powered Nutrition Orchestration</h1>
 
 <p align="center">
+  <a href="https://github.com/Osamsami/dietlog/actions/workflows/flutter_ci.yml">
+    <img src="https://github.com/Osamsami/dietlog/actions/workflows/flutter_ci.yml/badge.svg" alt="Flutter Production CI" />
+  </a>
+</p>
+
+<p align="center">
   <strong>A production-grade, high-fidelity Health & Fitness platform built with Clean Architecture, leveraging multimodal AI analysis and deterministic state management to automate dietary logging.</strong>
 </p>
 
@@ -132,4 +138,4 @@ The DietLog ecosystem was architected with a strict focus on high-precision stat
 <div align="center">
   <i>DietLog: Precision in Every Pixel, Nutrition in Every Scan.</i>
 </div>
-```
+```s
