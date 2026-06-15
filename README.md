@@ -138,4 +138,4 @@ The DietLog ecosystem was architected with a strict focus on high-precision stat
 <div align="center">
   <i>DietLog: Precision in Every Pixel, Nutrition in Every Scan.</i>
 </div>
-```s
+```
